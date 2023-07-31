@@ -14,7 +14,7 @@ docker pull pharmai/plip
 ```
 ### Shell Command
 ```sh
-docker run --rm -v ${PWD}:/results -w /results -u $(id -u ${USER}):$(id -g ${USER}) pharmai/plip:latest -f input.pdb -yv -o output_dir_path -x -t -y -p
+docker run --rm -v ${PWD}:/results -w /r0esults -u $(id -u ${USER}):$(id -g ${USER}) pharmai/plip:latest -f input.pdb -yv -o output_dir_path -x -t -y -p
 ```
 
 ### Option
