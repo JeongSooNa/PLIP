@@ -3,8 +3,16 @@ Protein Ligand Interaction Profiler
 
 This repository contains test content and script.
 
+JeongSoo Na. Syntekabio
+
 <img src="https://github.com/pharmai/plip/raw/master/pliplogo.png" width="100" height="100">
 
+<br>
+
+원활한 PLIP 세팅, 가동 및 결과 report 정리를 위한 Repository 입니다.  
+Window 와 Linux 환경 모두에서 사용 가능합니다.  
+Installation 및 Usage를 통해 간단한 test가 가능하지만  
+다중 작업 결과물을 통한 csv file 생성의 경우 약간의 python script 수정이 필요합니다.
 
 
 <br>
@@ -30,6 +38,8 @@ https://www.docker.com/products/docker-desktop/
 docker pull pharmai/plip
 # Window에서는 Power Shell CMD를 통해 docker 명령어를 실행합니다.
 ```
+- Docker Download 및 PLIP setting에 문제가 있을 경우 Issues 부탁드립니다!
+
 
 <br>
 <br>
@@ -98,7 +108,7 @@ time parallel --bar -S10.0.86.{1..100} -j 1 --joblog j --res o --resume-failed -
 
 - report.txt
 ```txt
-Prediction of noncovalent interactions for PDB structure 6NJS_PATT1_ZINC000725330958_5_PROTEIN
+Prediction of noncovalent interactions for PDB structure Target_PROTEIN
 ==============================================================================================
 Created on 2023/11/10 using PLIP v2.2.2
 
