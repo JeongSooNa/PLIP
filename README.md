@@ -150,7 +150,8 @@ Interacting chain(s): A
 ```
 - [python script](./get_PLIP_csv.py)를 통해 생성된 report.txt 내 데이터를 추출하여 csv file 생성
 
-
+<br>
+<br>
 
 # PLIP Options
 
@@ -225,6 +226,8 @@ Interacting chain(s): A
 
 - 상세한 output report 및 내용을 확인하시려면 [Document](./DOCUMENTATION.md) 참조
 
+<br>
+<br>
 
 # Reference
-#### [PLIP](https://github.com/pharmai/plip)
+[PLIP](https://github.com/pharmai/plip)
