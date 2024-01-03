@@ -1,87 +1,111 @@
-### Get PLIP Interaction Information csv file
+### Get PLIP Report
+### Get csv file from output report.txt
 ### JeongSoo Na
-### 2023.07.26
+### 2024.01.03
 
-### Needs Column
-### H-BOND : RESNR | RESTYPE | RESNR_LIG | SIDECHAIN | DIST_H-A | DIST_D-A | DON_ANGLE | PROTISDON | DONORTYPE | ACCEPTOORTYPE
-### pi-STACK : RESNR | RESTYPE | RESNR_LIG | CENTDIST | ANGLE | TYPE | LIG_IND_LIST
-
+### Packages import
 import os
+import sys
 
-f = open('/lwork01/jsna/list' , 'r')
-raw = f.read()
-list = raw.split('\n')
-list.remove('')
-len = len(list)
+current_path = os.getcwd()
+
+### parameter
+### Input data : Directory include input pdb files
+### Output directory : Directory saved PLIP output data and csv table
+input_dir = sys.argv[1]
+input_list = os.listdir(input_dir)
+output_dir = sys.argv[2]
+print("pdb number : " + str(len(input_list)))
+
+# 안돼 이동
+os.chdir(input_dir)
+
+### Make directory per pdb
+try:
+    if not os.path.exists(output_dir):
+        os.system("sudo mkdir " + output_dir)
+except OSError:
+    print("Error : Directory is already exists.")
+
+for i in input_list:
+    try:
+        if not os.path.exists(i):
+            os.system("sudo mkdir " + output_dir + "/" + i.replace(".pdb",""))
+    except OSError:
+        print("Error : Directory is already exists.")
+    
+
+### Run PLIP
+### command : sudo docker run --rm -v ${PWD}:/results -w /results -u $(id -u ${USER}):$(id -g ${USER}) pharmai/plip:latest -f target.pdb -yv -o output_dir/ -x -t -y -p
+for i in input_list:
+    os.system("sudo docker run --rm -v ${PWD}:/results -w /results -u $(id -u ${USER}):$(id -g ${USER}) pharmai/plip:latest -f " + i + " -yv -o " + output_dir + "/" + i.replace(".pdb","") + "/ -x -t -y -p")
+
+### Report to csv table
+### Interactions
+### - Hydrophobic Interaction
+### - Hydrogen Bond
+### - Water Bridges
+### - pi-Stacking (parallel)
+### - pi-Stacking (perpendicular)
+### - pi-Cation Interaction
+### - Halogen Bond
+### - Salt Bridge
+### - Metal Complex
+f = open(output_dir + "/plip_value_table.csv")
+f.write("PDB,Interaction_type,RESNR,RESTYPE,DIST,DIST_sub\n")
+for i in range(0,len(input_list)):
+# for i in range(0,1):
+    r = open(output_dir + "/" + input_list[i].replace(".pdb","") + "/report.txt")
+    report = r.read()
+    
+    # Hydrophobic Interactions
+    if "**Hydrophobic Interactions**" in report:
+        len = report.split("**Hydrophobic Interactions**\n")
+        for j in range(1,len):
+            tmp = report.split("**Hydrophobic Interactions**\n")[j].split("\n")[0].split("+")
+            report_hi = report.split("+" + tmp[1].replace("-","=") + "+" + tmp[2].replace("-","=") + "+" + tmp[3].replace("-","=") + "+" + tmp[4].replace("-","=") + "+" + tmp[5].replace("-","=") + "+" + tmp[6].replace("-","=") + "+" + tmp[7].replace("-","=") + "+" + tmp[8].replace("-","=") + "+" + tmp[9].replace("-","=") + "+" + tmp[10].replace("-","=") + "+" + tmp[11].replace("-","=") + "+\n")[1].split("\n" + "+" + tmp[1] + "+" + tmp[2] + "+" + tmp[3] + "+" + tmp[4] + "+" + tmp[5] + "+" + tmp[6] + "+" + tmp[7] + "+" + tmp[8] + "+" + tmp[9] + "+" + tmp[10] + "+" + tmp[11] + "+" + "\n\n")[0].split("\n" + "+" + tmp[1] + "+" + tmp[2] + "+" + tmp[3] + "+" + tmp[4] + "+" + tmp[5] + "+" + tmp[6] + "+" + tmp[7] + "+" + tmp[8] + "+" + tmp[9] + "+" + tmp[10] + "+" + tmp[11] + "+")
+            # print(len(report_hi))
+            for k in range(0,len(report_hi)):
+                RESNR = report_hi[k].split("|")[1].replace(" ","")
+                RESTYPE = report_hi[k].split("|")[2].replace(" ","")
+                DIST = report_hi[k].split("|")[7].replace(" ","")
+                ### updating
+                f.write(input_list[i].replace(".pdb","") + ",Hydrophobic Interactions," + RESNR + "," + RESTYPE + "," + DIST + ",," + "\n")
+            
+    
+    # Hydrogen Bonds
+    if "**Hydrogen Bonds**" in report:
+        len = report.split("**Hydrogen Bonds**\n")
+        for j in range(1,len):
+            tmp = report.split("**Hydrogen Bonds**\n")[j].split("\n")[0].split("+")
+            report_hb = report.split("+" + tmp[1].replace("-","=") + "+" + tmp[2].replace("-","=") + "+" + tmp[3].replace("-","=") + "+" + tmp[4].replace("-","=") + "+" + tmp[5].replace("-","=") + "+" + tmp[6].replace("-","=") + "+" + tmp[7].replace("-","=") + "+" + tmp[8].replace("-","=") + "+" + tmp[9].replace("-","=") + "+" + tmp[10].replace("-","=") + "+" + tmp[11].replace("-","=") + "+" + tmp[12].replace("-","=") + "+" + tmp[13].replace("-","=") + "+" + tmp[14].replace("-","=") + "+" + tmp[15].replace("-","=") + "+" + tmp[16].replace("-","=") + "+" + tmp[17].replace("-","=") + "+\n")[1].split("\n" + "+" + tmp[1] + "+" + tmp[2] + "+" + tmp[3] + "+" + tmp[4] + "+" + tmp[5] + "+" + tmp[6] + "+" + tmp[7] + "+" + tmp[8] + "+" + tmp[9] + "+" + tmp[10] + "+" + tmp[11] + "+" + tmp[12] + "+" + tmp[13] + "+" + tmp[14] + "+" + tmp[15] + "+" + tmp[16] + "+" + tmp[17] + "+" + "\n\n")[0].split("\n" + "+" + tmp[1] + "+" + tmp[2] + "+" + tmp[3] + "+" + tmp[4] + "+" + tmp[5] + "+" + tmp[6] + "+" + tmp[7] + "+" + tmp[8] + "+" + tmp[9] + "+" + tmp[10] + "+" + tmp[11] + "+" + tmp[12] + "+" + tmp[13] + "+" + tmp[14] + "+" + tmp[15] + "+" + tmp[16] + "+" + tmp[17] + "+")
+            # print(len(report_hb))
+            for k in range(0,len(report_hb)):
+                RESNR = report_hb[k].split("|")[1].replace(" ","")
+                RESTYPE = report_hb[k].split("|")[2].replace(" ","")
+                DIST = report_hb[k].split("|")[8].replace(" ","")
+                DIST_sub = report_hb[k].split("|")[9].replace(" ","")
+                f.write(input_list[i].replace(".pdb","") + ",Hydrogen Bonds," + RESNR + "," + RESTYPE + "," + DIST + "," + DIST_sub + "\n")
+            
+    
+    
+    # Salt Bridges
+    if "**Salt Bridges**" in report:
+        len = report.split("**Salt Bridges**\n")
+        for j in range(1,len):
+            tmp = report.split("**Salt Bridges**\n")[j].split("\n")[0].split("+")
+            report_sb = report.split("+" + tmp[1].replace("-","=") + "+" + tmp[2].replace("-","=") + "+" + tmp[3].replace("-","=") + "+" + tmp[4].replace("-","=") + "+" + tmp[5].replace("-","=") + "+" + tmp[6].replace("-","=") + "+" + tmp[7].replace("-","=") + "+" + tmp[8].replace("-","=") + "+" + tmp[9].replace("-","=") + "+" + tmp[10].replace("-","=") + "+" + tmp[11].replace("-","=") + "+" + tmp[12].replace("-","=") + "+" + tmp[13].replace("-","=") + "+\n")[1].split("\n" + "+" + tmp[1] + "+" + tmp[2] + "+" + tmp[3] + "+" + tmp[4] + "+" + tmp[5] + "+" + tmp[6] + "+" + tmp[7] + "+" + tmp[8] + "+" + tmp[9] + "+" + tmp[10] + "+" + tmp[11] + "+" + tmp[12] + "+" + tmp[13] + "+" + "\n\n")[0].split("\n" + "+" + tmp[1] + "+" + tmp[2] + "+" + tmp[3] + "+" + tmp[4] + "+" + tmp[5] + "+" + tmp[6] + "+" + tmp[7] + "+" + tmp[8] + "+" + tmp[9] + "+" + tmp[10] + "+" + tmp[11] + "+" + tmp[12] + "+" + tmp[13] + "+")
+            # print(len(report_sb))
+            for k in range(0,len(report_sb)):
+                RESNR = report_sb[k].split("|")[1].replace(" ","")
+                RESTYPE = report_sb[k].split("|")[2].replace(" ","")
+                DIST = report_sb[k].split("|")[8].replace(" ","")
+                f.write(input_list[i].replace(".pdb","") + ",Salt Bridges," + RESNR + "," + RESTYPE + "," + DIST + ",," + "\n")
+
 f.close()
 
-# Hydrogen Bond Column
-h_list = ["RESNR","RESTYPE","RESCHAIN","RESNR_LIG","RESTYPE_LIG","RESCHAIN_LIG","SIDECHAIN","DIST_H-A","DIST_D-A","DON_ANGLE","PROTISDON","DONORIDX","DONORTYPE","ACCEPTORIDX","ACCEPTORTYPE","LIGCOO","PROTCOO"]
-h_list_header = '| RESNR | RESTYPE | RESCHAIN | RESNR_LIG | RESTYPE_LIG | RESCHAIN_LIG | SIDECHAIN | DIST_H-A | DIST_D-A | DON_ANGLE | PROTISDON | DONORIDX | DONORTYPE | ACCEPTORIDX | ACCEPTORTYPE | LIGCOO                 | PROTCOO                | \n+=======+=========+==========+===========+=============+==============+===========+==========+==========+===========+===========+==========+===========+=============+==============+========================+========================+'
-#pi-Stacking Column
-p_list = ["RESNR","RESTYPE","RESCHAIN","RESNR_LIG","RESTYPE_LIG","RESCHAIN_LIG","PROT_IDX_LIST","CENTDIST","ANGLE","OFFSET","TYPE","LIG_IDX_LIST","LIGCOO","PROTCOO"]
-p_list_header_2 = '| RESNR | RESTYPE | RESCHAIN | RESNR_LIG | RESTYPE_LIG | RESCHAIN_LIG | PROT_IDX_LIST                 | CENTDIST | ANGLE | OFFSET | TYPE | LIG_IDX_LIST                  | LIGCOO                 | PROTCOO                | \n+=======+=========+==========+===========+=============+==============+===============================+==========+=======+========+======+===============================+========================+========================+'
-p_list_header_1 = '| RESNR | RESTYPE | RESCHAIN | RESNR_LIG | RESTYPE_LIG | RESCHAIN_LIG | PROT_IDX_LIST                 | CENTDIST | ANGLE | OFFSET | TYPE | LIG_IDX_LIST             | LIGCOO                 | PROTCOO                | \n+=======+=========+==========+===========+=============+==============+===============================+==========+=======+========+======+==========================+========================+========================+'
+### I will update the Calculation Process & Filtering System
+### Update code clearly
+### MIT License
 
-h = open("resert_hydrogen_bond.csv","w")
-h.write("No,PDB_Name,Interaction_type,RESNR,RESTYPE,RESCHAIN,RESNR_LIG,RESTYPE_LIG,RESCHAIN_LIG,SIDECHAIN,DIST_H-A,DIST_D-A,DON_ANGLE\n")
-
-p = open("resert_pi_stacking.csv","w")
-p.write("No,PDB_Name,Interaction_type,RESNR,RESTYPE,RESCHAIN,RESNR_LIG,RESTYPE_LIG,RESCHAIN_LIG,PROT_IDX_LIST,CENTDIST,ANGLE,OFFSET,TYPE")
-
-no_1 = 1
-no_2 = 1
-
-for i in list:
-	for j in range(4001,5001):
-		f = open('/STG24-1/jsna/' + str(i) + '/' + str(j) + '/report.txt')
-		text = f.read()
-		if 'LIG:A:264 (LIG) - SMALLMOLECULE' in text:
-			text = text.split('LIG:A:264 (LIG) - SMALLMOLECULE')[1]
-			### Get Hydrogen Bonds
-			if '**Hydrogen Bonds**' in text:
-				text_h = text.split(h_list_header)[1].split('+-------+---------+----------+-----------+-------------+--------------+-----------+----------+----------+-----------+-----------+----------+-----------+-------------+--------------+------------------------+------------------------+\n\n')[0]
-				text_i = text_h.split("\n+-------+---------+----------+-----------+-------------+--------------+-----------+----------+----------+-----------+-----------+----------+-----------+-------------+--------------+------------------------+------------------------+")
-				for k in text_i:
-					text_list = k.split("|")
-					del text_list[0]
-					del text_list[17]
-					for l in range(0,17):
-						text_list[l] = text_list[l].replace(" ","")
-					print(text_list)
-					h.write(str(no_1) + "," + str(i) + "-" + str(j) + ".pdb,Hydrogen Bonds," + text_list[0] + "," + text_list[1] + "," + text_list[2] + "," + text_list[3] + "," + text_list[4] + "," + text_list[5] + "," + text_list[6] + "," + text_list[7] + "," + text_list[8] + "," + text_list[9] + "\n")
-				no_1 = no_1 + 1
-			### Get pi-Stacking
-			if '**pi-Stacking**\n+-------+---------+----------+-----------+-------------+--------------+-------------------------------+----------+-------+--------+------+--------------------------+------------------------+------------------------+' in text:
-				text_p = text.split(p_list_header_1)[1].split('+-------+---------+----------+-----------+-------------+--------------+-------------------------------+----------+-------+--------+------+--------------------------+------------------------+------------------------+\n\n')[0]
-                                text_i = text_p.split("\n+-------+---------+----------+-----------+-------------+--------------+-------------------------------+----------+-------+--------+------+--------------------------+------------------------+------------------------+")
-                                for k in text_i:
-                                        text_list = k.split("|")
-                                        del text_list[0]
-                                        del text_list[13]
-                                        for l in range(0,13):
-                                                text_list[l] = text_list[l].replace(" ","")
-						if(l==6):
-							text_list[l] = text_list[l].replace(",","/")
-                                        print(text_list)
-                                        p.write(str(no_2) + "," + str(i) + "-" + str(j) + ".pdb,Hydrogen Bonds," + text_list[0] + "," + text_list[1] + "," + text_list[2] + "," + text_list[3] + "," + text_list[4] + "," + text_list[5] + "," + text_list[6] + "," + text_list[7] + "," + text_list[8] + "," + text_list[9] + "," + text_list[10] + "\n")
-                                no_2 = no_2 + 1
-			if '**pi-Stacking**\n+-------+---------+----------+-----------+-------------+--------------+-------------------------------+----------+-------+--------+------+-------------------------------+------------------------+------------------------+' in text:
-                                text_p = text.split(p_list_header_2)[1].split('+-------+---------+----------+-----------+-------------+--------------+-------------------------------+----------+-------+--------+------+-------------------------------+------------------------+------------------------+\n\n')[0]
-                                text_i = text_p.split("\n+-------+---------+----------+-----------+-------------+--------------+-------------------------------+----------+-------+--------+------+-------------------------------+------------------------+------------------------+")
-                                for k in text_i:
-                                        text_list = k.split("|")
-                                        del text_list[0]
-                                        del text_list[13]
-                                        for l in range(0,13):
-                                                text_list[l] = text_list[l].replace(" ","")
-                                                if(l==6):
-                                                        text_list[l] = text_list[l].replace(",","/")
-                                        print(text_list)
-                                        p.write(str(no_2) + "," + str(i) + "-" + str(j) + ".pdb,Hydrogen Bonds," + text_list[0] + "," + text_list[1] + "," + text_list[2] + "," + text_list[3] + "," + text_list[4] + "," + text_list[5] + "," + text_list[6] + "," + text_list[7] + "," + text_list[8] + "," + text_list[9] + "," + text_list[10] + "\n")
-                                no_2 = no_2 + 1
-		else:
-			print("There is no ligand information.")
-	
-h.close()
-p.close()
+os.chdir(current_path)
