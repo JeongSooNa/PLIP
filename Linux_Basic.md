@@ -21,7 +21,6 @@ my_directory/data
 ```
 
 ### basic command
-
 ```sh
 # 현재 경로
 pwd
