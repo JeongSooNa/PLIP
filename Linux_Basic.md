@@ -73,4 +73,7 @@ cat my_file.txt | grep -c "want" # grep한 라인의 수
 
 # 라인 넘버 표기
 :set nu
+
+# 줄바꿈 없애기
+:set nowrap
 ```
